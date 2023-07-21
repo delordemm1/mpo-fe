@@ -6,7 +6,14 @@ import CheckoutComponent from "../../components/CheckoutComponent";
 import Layout from "../../components/Layout";
 import { Store } from "../../utils/Store";
 
+import { loadStripe } from '@stripe/stripe-js'
+import { Elements } from '@stripe/react-stripe-js';
+import PaymentForm from '@/components/Payment/PaymentForm'
+
 export default function PaymentScreen() {
+
+  const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
+
   const router = useRouter();
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");
   const { state, dispatch } = useContext(Store);
@@ -36,6 +43,11 @@ export default function PaymentScreen() {
   return (
     <Layout title="Payment Method">
       <CheckoutComponent activeStep={3} />
+
+      <Elements stripe={stripePromise}>
+        <PaymentForm checkadd={checkadd} checkoutData={checkoutData} />
+      </Elements>
+
       <form className="mx-auto max-w-screen-md" onSubmit={submitHandler}>
         <h1 className="mb-4 text-xl">Payment Method</h1>
         {["Stripe", "PayPal", "CashOnDelivery"].map((payment) => (
