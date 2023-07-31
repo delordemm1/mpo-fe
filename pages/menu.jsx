@@ -8,6 +8,7 @@ import { getMenu } from "../services/menu.api";
 import { Box, LoadingOverlay, Text } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
 import { toast } from "react-toastify";
+import axios from "axios";
 
 export default function Menu() {
 	const [loading, setLoading] = useState(true);
@@ -16,32 +17,42 @@ export default function Menu() {
 		...new Set(data.meals.map((item) => item.category)),
 	];
 	const [mealsInfo, setMealsInfo] = useState([]);
+
 	const [activeCategory, setActiveCategory] = useState(null);
 	const [search, setSearch] = useState("");
 	const [debouncedSearch] = useDebouncedValue(search, 1000);
 
-	const handleFetchMenu = async () => {
-		try {
-			setLoading(true);
-			getMenu({ name: debouncedSearch }).then(({ data }) => {
-				setMealsInfo(data.results);
-			});
-			const { data } = await getMenu({ name: debouncedSearch });
-			setMealsInfo(data.results);
-		} catch (error) {
-			toast.error(error?.message || error);
-		} finally {
+	useEffect(() => {
+		axios.get(`http://localhost:3000/v1/meals/${process.env.NEXT_PUBLIC_RESTAURANT_ID}`).then((response) => {
+			setMealsInfo(response.data.results);
 			setLoading(false);
-		}
-	};
+		});
+	  }, [])
 
-	useEffect(() => {
-		handleFetchMenu();
-	}, []);
+	
 
-	useEffect(() => {
-		handleFetchMenu();
-	}, [debouncedSearch]);
+	// const handleFetchMenu = async () => {
+	// 	try {
+	// 		setLoading(true);
+	// 		getMenu().then(({ data }) => {
+	// 			setMealsInfo(data.results);
+	// 		});
+	// 		const { data } = await getMenu();
+	// 		setMealsInfo(data.results);
+	// 	} catch (error) {
+	// 		toast.error(error?.message || error);
+	// 	} finally {
+	// 		setLoading(false);
+	// 	}
+	// };
+
+	// useEffect(() => {
+	// 	handleFetchMenu();
+	// }, []);
+
+	// useEffect(() => {
+	// 	handleFetchMenu();
+	// }, [debouncedSearch]);
 
 	const filteredMeals = useMemo(() => {
 		return mealsInfo.filter((meal) => {

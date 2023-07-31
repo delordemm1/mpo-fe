@@ -8,4 +8,5 @@ export const getMenu = (params) => {
 
 export const getMealDetail = (item) => {
     return AuthClient().get(`/v1/meals/${item}`);
+    
 };
