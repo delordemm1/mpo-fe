@@ -1,54 +1,70 @@
-import React, { useContext, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Layout from "../components/Layout";
-import MealItem from "@/components/Menu/MealItem";
-
+import MealItem from "@/components/Menu/Item";
 import data from "@/utils/data";
 import { FaMapMarkerAlt, FaSearch } from "react-icons/fa";
-import CategoriesSection from "@/components/Categories";
+import Category from "@/components/Categories/Category";
+import { getMealsByRestaurant } from "../services/menu.api";
+import { Box, LoadingOverlay, Text } from "@mantine/core";
+import { useDebouncedValue } from "@mantine/hooks";
+import { toast } from "react-toastify";
 
 export default function Menu() {
-  const [openModal, setOpenModal] = useState(false);
-  const allCategories = [
+  const [loading, setLoading] = useState(true);
+  const categories = [
     "All",
     ...new Set(data.meals.map((item) => item.category)),
   ];
-
-  const [mealsInfo, setMealsInfo] = useState(data.meals);
-  // console.log("mealsinfo", mealsInfo);
-  const [category, seCategory] = useState(allCategories);
+  const [mealsInfo, setMealsInfo] = useState([]);
+  const [activeCategory, setActiveCategory] = useState(null);
   const [search, setSearch] = useState("");
+  const [debouncedSearch] = useDebouncedValue(search, 1000);
 
-  const filterCategories = (category) => {
-    if (category === "All") {
-      setMealsInfo(mealsInfo);
-      return;
+  const handleFetchMenu = async () => {
+    try {
+      setLoading(true);
+      getMealsByRestaurant({ name: debouncedSearch }).then(({ data }) => {
+        setMealsInfo(data.results);
+      });
+      const { data } = await getMealsByRestaurant({ name: debouncedSearch });
+      setMealsInfo(data.results);
+    } catch (error) {
+      toast.error(error?.message || error);
+    } finally {
+      setLoading(false);
     }
-    const newitems = mealsInfo.filter((meal) => meal.category === category);
-    setMealsInfo(newitems);
   };
 
-  const filterSearch = (e) => {
-    const enteredSearch = e.target.value.toLowerCase();
-    const filteredSearch = mealsInfo.filter((item) =>
-      item.name.toLowerCase().includes(enteredSearch)
-    );
-    setSearch(filteredSearch);
-    setMealsInfo(filteredSearch);
-  };
+  useEffect(() => {
+    handleFetchMenu();
+  }, []);
+
+  useEffect(() => {
+    handleFetchMenu();
+  }, [debouncedSearch]);
+
+  const filteredMeals = useMemo(() => {
+    return mealsInfo.filter((meal) => {
+      if (activeCategory === "All" || !activeCategory) return true;
+      return (
+        (!activeCategory || activeCategory === meal.category) &&
+        meal.name.includes(search)
+      );
+    });
+  }, [mealsInfo, activeCategory, search]);
 
   return (
     <Layout title="MPO Menu">
-      {/* <Meals meals={meals} /> */}
       <div className="bg-white">
-        <div className="container mx-auto  px-0  sm:px-6 lg:px-8 ">
+        <div className="container mx-auto mb-4">
           <div className="flex bg-yellow-300 p-3 mt-5 items-center">
             <FaMapMarkerAlt size={25} />
             <p className="ml-2">Delivering To 14145 Ikorodu Close, Lagos</p>
           </div>
-          <div className="mt-3 mb-5 flex relative mx-5 md:mx-0">
+          <div className="mt-3 mb-5 flex relative md:mx-0">
             <input
-              // value={search}
-              onChange={filterSearch}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
               type="text"
               placeholder="Search for meals..."
               className=" hover:shadow-lg border w-full py-3 px-4 rounded outline-none bg-gray-200"
@@ -59,25 +75,38 @@ export default function Menu() {
             />
           </div>
 
-          <div className="flex items-start flex-col md:flex-row">
-            <div className="md:w-1/4">
-              <CategoriesSection
-                category={category}
-                filterCategories={filterCategories}
+          <div className="gap-4 grid grid-cols-1 lg:grid-cols-4 mx-4">
+            <div className="w-full col-span-1">
+              {/* <div className="bg-white border p-5 rounded shadow-md w-full"> */}
+              <Category
+                categories={categories}
+                activeCategory={activeCategory || "All"}
+                setActiveCategory={(category) => setActiveCategory(category)}
               />
+              {/* </div> */}
             </div>
-            <div className="w-full md:w-3/4 py-5 md:ml-7 md:py-6 md:pt-0 rounded mb-20 ">
-              <ul
-                role="list"
-                className="space-y-1 sm:grid sm:grid-cols-4 sm:gap-x-6 sm:gap-y-8 sm:space-y-0 lg:gap-x-8"
-              >
-                {mealsInfo.map((meal) => (
-                  <div>
-                    <MealItem meal={meal} key={meal.slug} />
-                    {/* <Modal open={openModal} /> */}
-                  </div>
-                ))}
-              </ul>
+            <div className="relative col-span-1 lg:col-span-3">
+              <LoadingOverlay visible={loading} overlayBlur={2} />
+              {filteredMeals && filteredMeals.length ? (
+                <div className="w-full py-5 md:py-6 md:pt-0 rounded mb-20">
+                  <ul
+                    role="list"
+                    className="space-y-1 sm:grid grid-cols-2 lg:grid-cols-3 sm:gap-x-6 sm:gap-y-8 sm:space-y-0 lg:gap-x-8"
+                  >
+                    {filteredMeals.map((meal, index) => (
+                      <MealItem meal={meal} key={index} />
+                    ))}
+                  </ul>
+                </div>
+              ) : (
+                <div className="col-span-3 w-full h-full flex items-center justify-center flex-col text-md">
+                  <Text align="center">No results found</Text>
+                  <Text c="dimmed">
+                    Look like there is no meal that match your criteria, please
+                    try another one.
+                  </Text>
+                </div>
+              )}
             </div>
           </div>
         </div>
