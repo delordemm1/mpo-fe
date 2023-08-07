@@ -398,3 +398,8 @@ FodyWeavers.xsd
 *.sln.iml
 /.next
 /dist
+.env.local
+.env
+
+# package-lock
+package-lock.json
