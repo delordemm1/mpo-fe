@@ -9,7 +9,7 @@ import { useRouter } from "next/router";
 import Counter from "../Counter";
 
 function classNames(...classes) {
-  return classes.filter(Boolean).join(" ");
+	return classes.filter(Boolean).join(" ");
 }
 
 function MealItem({ meal }) {
