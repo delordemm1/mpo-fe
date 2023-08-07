@@ -4,7 +4,7 @@ import MealItem from "@/components/Menu/Item";
 import data from "@/utils/data";
 import { FaMapMarkerAlt, FaSearch } from "react-icons/fa";
 import Category from "@/components/Categories/Category";
-import { getMenu } from "../services/menu.api";
+import { getMealsByRestaurant } from "../services/menu.api";
 import { Box, LoadingOverlay, Text } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
 import { toast } from "react-toastify";
@@ -53,6 +53,10 @@ export default function Menu() {
 	// useEffect(() => {
 	// 	handleFetchMenu();
 	// }, [debouncedSearch]);
+
+	useEffect(() => {
+		handleFetchMenu();
+	}, [debouncedSearch]);
 
 	const filteredMeals = useMemo(() => {
 		return mealsInfo.filter((meal) => {
