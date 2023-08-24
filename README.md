@@ -67,3 +67,14 @@ Check out the [Next.js deployment documentation](https://nextjs.org/docs/deploym
 Contributions to the MPO Project are currently not accepted as it is not an open-source project. However, feedback and suggestions are always welcome.
 ```
 
+## Docker Image
+## To configure the gcloud
+- gcloud auth configure-docker
+
+- docker build -t mpo-fe -f Dockerfile .
+
+- docker images
+
+- docker tag a5b465033aa9 us.gcr.io/nodal-ivy-385013/mpo-fe:v1
+
+- docker push us.gcr.io/nodal-ivy-385013/mpo-fe:v1

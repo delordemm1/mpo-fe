@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mpo-fe-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: mpo-fe
+  template:
+    metadata:
+      labels:
+        app: mpo-fe
+    spec:
+      containers:
+        - name: mpo-fe
+          image: us.gcr.io/nodal-ivy-385013/mpo-fe:latest
+          ports:
+            - containerPort: 3000
