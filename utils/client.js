@@ -5,7 +5,7 @@ class Client {
     axios = Axios;
 
     constructor() {
-        this.axios.defaults.baseURL = process.env.NEXT_PUBLIC_API_ENDPOINT;
+        this.axios.defaults.baseURL = process.env.NEXT_PUBLIC_API_ENDPOINT ?? 'https://mpo.herokuapp.com';
     }
 
     create = () => {
