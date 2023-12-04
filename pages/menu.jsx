@@ -29,7 +29,7 @@ export const getServerSideProps = async (context) => {
 export default function Menu({ meals, error }) {
 	const [loading, setLoading] = useState(true);
 	const [mealsInfo, setMealsInfo] = useState(meals || []);
-	const [AllProduct, setAllProduct] = useState([]);
+	const [AllProduct, setAllProduct] = useState(meals ||[]);
 	const [activeCategory, setActiveCategory] = useState(null);
 	const [search, setSearch] = useState("");
 
