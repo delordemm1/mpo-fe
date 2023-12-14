@@ -14,16 +14,8 @@ function CartProvider({ children }) {
 	const addCartItem = (item, quantity, price) => {
 		axios
 			.post(`${process.env.NEXT_PUBLIC_API_ENDPOINT}/v1/cart/`, {
-				userId: "64c9d87f7fd51e047142df7d",
-				items: [
-					{
-						mealId: item,
-						quantity: quantity,
-						price: price,
-						total: quantity * price,
-					},
-				],
-				// "subTotal" : 160
+				mealId: item,
+				quantity: quantity,
 			})
 			// addToCart({
 			// 	userId: "64c9d87f7fd51e047142df7d",
