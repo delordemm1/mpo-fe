@@ -21,10 +21,10 @@ function MealItem({ meal }) {
 
 	const handleAddToCart = (meal, quantity) => {
 		// if (quantity > 0) {
-		const Token = Cookies.get("access-token");
-		if (!Token) {
-			return router.push("/auth/login");
-		}
+		// const Token = Cookies.get("access-token");
+		// if (!Token) {
+		// 	return router.push("/auth/login");
+		// }
 		addCartItem(meal.id, quantity, meal.price);
 		// } else {
 		// 	removeCartItem(meal.id)
